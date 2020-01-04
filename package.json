@@ -1,0 +1,30 @@
+{
+  "name": "@arsenicjs/core",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepare": "npm run build",
+    "test": "npx mocha test/",
+    "build": "tsc"
+  },
+  "keywords": [
+    "web",
+    "server"
+  ],
+  "author": "Christophe Maillot <christophe.maillot@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^11.13.4",
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
+    "port-finder": "^0.12.4",
+    "server-destroy": "^1.0.1",
+    "typescript": "^3.4.3",
+    "@types/xregexp": "^3.0.29"
+  },
+  "dependencies": {
+    "xregexp": "^4.2.4"
+  }
+}
