@@ -1,7 +1,7 @@
 {
   "name": "@arsenic/core",
   "version": "0.1.0",
-  "description": "",
+  "description": "A node.js lightweight web framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -11,9 +11,15 @@
   },
   "keywords": [
     "web",
-    "server"
+    "server",
+    "framework"
   ],
   "author": "Christophe Maillot <christophe.maillot@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/christophemaillot/arsenicjs-core"
+  },
+  "homepage": "https://github.com/christophemaillot/arsenicjs-core",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^11.13.4",

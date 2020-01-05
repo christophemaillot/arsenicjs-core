@@ -18,11 +18,19 @@ const port = process.env.PORT || DEFAULT_PORT
 const app = arsenic()
 
 app
-    .route("/account/register")
+    .route("/message/:id")
+    .method("GET")
+    .target((req, res) => { 
+      res.header("Content-Type: text/plain").body("this is message " + req.pathparams.id).end()
+    })
+
+app
+    .route("/message/:id")
     .method("PUT")
     .contentType("application/json")
     .target((req, res) => { 
-      res.header("Content-Type: text/plain").body("OK").end()
+      // do something with message
+      res.header("Content-Type: text/plain").body("message " + req.pathparams.id + " updated").end()
     })
 
 app.listen(port)
