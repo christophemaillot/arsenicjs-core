@@ -10,7 +10,7 @@ ArsenicJS is a lightweight node.js web framework.
 # sample usage
 
 ```
-const {arsenic} = require('@arsenic/core')
+const {arsenic} = require('@arsenicjs/core')
 
 const DEFAULT_PORT = 8010
 const port = process.env.PORT || DEFAULT_PORT
@@ -35,3 +35,10 @@ app
 
 app.listen(port)
 ```
+
+# releases
+
+## release 0.1.0
+
+- initial release
+
