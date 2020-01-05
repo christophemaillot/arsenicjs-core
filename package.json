@@ -1,5 +1,5 @@
 {
-  "name": "@arsenic/core",
+  "name": "@arsenicjs/core",
   "version": "0.1.0",
   "description": "A node.js lightweight web framework",
   "main": "dist/index.js",
