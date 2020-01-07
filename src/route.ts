@@ -1,19 +1,18 @@
-import { PatternMatcher } from "./patternmatcher";
-import { ArsenicRequest } from "./request";
 
 import XRegExp = require("xregexp")
 import { ArsenicResponse } from "./response";
+import { ArsenicRequest } from "./request";
 
 export class Route {
     
-    private _pattern: string
     private _method: string[] = []
     private _contentTypes: string[] = []
-    private _target:Function|null = null
+    private _target:((req:ArsenicRequest, resp:ArsenicResponse)=>void)|null = null
     private _regexp:RegExp
 
+    private _filters: Array<(req:ArsenicRequest, resp:ArsenicResponse, next:(req:ArsenicRequest, resp:ArsenicResponse)=>void)=>void> = [];
+
     constructor(pattern:string) {
-        this._pattern = pattern
         const  p = "^" + pattern.replace(/:([a-zA-Z0-9]+)/g, "(?<_$1>[^\\/]+)") + "/?$"
         this._regexp = XRegExp(p)
     }
@@ -43,7 +42,7 @@ export class Route {
      * Set the target handler of this route.
      * @param target a non null handler function
      */
-    public target(target:Function) {
+    public target(target:((req:ArsenicRequest, resp:ArsenicResponse)=>void)) {
         this._target = target;
         return this
     }
@@ -71,9 +70,42 @@ export class Route {
         return this._contentTypes.length == 0 || this._contentTypes.includes(req.contentType)
     }
 
-    public handle(req:ArsenicRequest, res:ArsenicResponse) {
-        if (this._target != null) {
-            this._target(req, res)
+    public handle(req:ArsenicRequest, resp:ArsenicResponse) {
+        this._handle(req, resp, this._filters);
+    }
+
+    public _handle(req:ArsenicRequest, resp:ArsenicResponse, filters:Array<(req:ArsenicRequest, resp:ArsenicResponse, next:(req:ArsenicRequest, resp:ArsenicResponse)=>void)=>void>) {
+        if (filters.length == 0) {
+            if (this._target != null) {
+                this._target(req, resp);
+            }
+        } else {
+            let filter = filters.pop()
+
+            let next = (areq:ArsenicRequest, aresp:ArsenicResponse) => {
+                if (areq == null) {
+                    throw("next() function call with a null request instance.")
+                }
+                if (aresp == null) {
+                    throw("next() function call with a null response instance.")
+                }
+                this._handle(areq, aresp, filters)
+            }
+            if (filter) {
+                filter(req, resp, next.bind(this));
+            }
         }
     }
+
+    /**
+     * Add a filter to this route.
+     * 
+     * @param filter 
+     * 
+     */
+    public filter(filter:(req:ArsenicRequest, resp:ArsenicResponse, next:(req:ArsenicRequest, resp:ArsenicResponse)=>void)=>void) {
+        this._filters.push(filter)
+        return this;
+    }
+
 }
