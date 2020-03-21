@@ -1,5 +1,7 @@
 let { arsenic } = require('../dist/index')
 
+console.log(arsenic)
+
 //let portfinder = require("portfinder")
 let chai = require('chai');
 let chaiHttp = require('chai-http');
@@ -14,9 +16,13 @@ const PORT = 28087;
 // ================================================================================================================================ //
 
 const alter = (req, resp, next) => {
-    resp.header("X-Filtered: true")
-    next()
+    resp.header("X-Filtered", "true")
+    next(req, resp)
 }
+
+const f = (req, resp, next) => req.test = [] && next(req, resp);
+const f1 = (req, resp, next) => req.test.push(1) && next(req, resp) 
+const f2 = (req, resp, next) => req.test.push(2) && next(req, resp)
 
 let app = arsenic()
 app.route("/about").method("GET").target((req, res) => { res.header("Content-Type","text/plain").body("OK").end() })
@@ -24,7 +30,9 @@ app.route("/user").method("POST").contentType("application/json").target((req, r
 app.route("/no/content").method("GET").target((req, res) => { res.status(204).end() })
 app.route("/account/:id/metadata").method("GET").target((req, res) => { res.header("Content-Type","text/plain").body("account:" + req.pathparams.id).end() })
 
-app.route("/filtered").filter(alter).target((req, res) => res.header("Content-Type", "text/plain").body("OK"));
+app.route("/filtered").filter(alter).target((req, res) => res.header("Content-Type", "text/plain").body("OK").end());
+
+app.route("/filterorder").filter(f).filter(f1).filter(f2).target((req, res) => res.header("Content-Type", "text/plain").body("OK"+req.test.join(",")).end());
 
 app.route("/custom-headers").method("GET").target((req, res) => {
     res.status(200)
@@ -162,4 +170,17 @@ describe('the /filter resource should be filtered', () => {
                 done();
             });
     });
+});
+
+describe('the /filterorder resource must handle the filters in the proper order', () => {
+    it('it should return the correct body', (done) => {
+        chai.request(app)
+            .keepOpen()
+            .get('/filterorder')
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.text).to.be.eql("OK1,2");
+                done();
+            });
+        });
 });

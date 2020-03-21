@@ -80,7 +80,7 @@ export class Route {
                 this._target(req, resp);
             }
         } else {
-            let filter = filters.pop()
+            let filter = filters.shift()
 
             let next = (areq:ArsenicRequest, aresp:ArsenicResponse) => {
                 if (areq == null) {

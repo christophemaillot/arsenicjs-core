@@ -1,6 +1,6 @@
 
 import Application from "./application"
 
-export default function arsenic() {
+export function arsenic() {
   return new Application()
 }

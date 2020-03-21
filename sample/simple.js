@@ -1,4 +1,4 @@
-const {arsenic} = require("../dist/")
+const { arsenic } = require("../dist/")
 const {ConsoleLogger} = require("../dist/logger")
 
 const app = arsenic()
