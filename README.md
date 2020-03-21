@@ -116,6 +116,11 @@ app.listen(port)
 
 - add route-level filters
 
+## release 0.3.0
+
+- more advanced sample in README
+- fix filters applied in the wrong order
+
 ## todos
 
 - make the framework more robust
