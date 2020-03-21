@@ -13,11 +13,18 @@ const PORT = 28087;
 //       set up default test arsenic app                                                                                            //
 // ================================================================================================================================ //
 
+const alter = (req, resp, next) => {
+    resp.header("X-Filtered: true")
+    next()
+}
+
 let app = arsenic()
 app.route("/about").method("GET").target((req, res) => { res.header("Content-Type","text/plain").body("OK").end() })
 app.route("/user").method("POST").contentType("application/json").target((req, res) => { res.header("Content-Type","text/plain").body("done").end() })
 app.route("/no/content").method("GET").target((req, res) => { res.status(204).end() })
 app.route("/account/:id/metadata").method("GET").target((req, res) => { res.header("Content-Type","text/plain").body("account:" + req.pathparams.id).end() })
+
+app.route("/filtered").filter(alter).target((req, res) => res.header("Content-Type", "text/plain").body("OK"));
 
 app.route("/custom-headers").method("GET").target((req, res) => {
     res.status(200)
@@ -139,6 +146,19 @@ describe('the path parameters should be parsed accordingly ', () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.text).to.be.eql("account:FB11465A-48B7-46BB-B6B1-00D2670F9180")
+                done();
+            });
+    });
+});
+
+describe('the /filter resource should be filtered', () => {
+    it('it should has custom headers', (done) => {
+        chai.request(app)
+            .keepOpen()
+            .get('/filtered')
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header("X-filtered", "true")
                 done();
             });
     });

@@ -59,3 +59,5 @@ app.listen(port)
 
 - make the framework more robust
 - add app level error handlers
+- make a nice README like this one : https://www.npmjs.com/package/commander
+
