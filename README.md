@@ -108,18 +108,22 @@ app.listen(port)
 
 # releases
 
-## release 0.1.0
+## release 0.4.0
 
-- initial release
-
-## release 0.2.0
-
-- add route-level filters
+- app level filtering with the app.filter() method
 
 ## release 0.3.0
 
 - more advanced sample in README
 - fix filters applied in the wrong order
+
+## release 0.2.0
+
+- add route-level filtering
+
+## release 0.1.0
+
+- initial release
 
 ## todos
 

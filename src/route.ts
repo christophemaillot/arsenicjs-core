@@ -2,9 +2,11 @@
 import XRegExp = require("xregexp")
 import { ArsenicResponse } from "./response";
 import { ArsenicRequest } from "./request";
+import Application, {FilterType} from "./application";
 
 export class Route {
     
+    private _app: Application;
     private _method: string[] = []
     private _contentTypes: string[] = []
     private _target:((req:ArsenicRequest, resp:ArsenicResponse)=>void)|null = null
@@ -12,9 +14,10 @@ export class Route {
 
     private _filters: Array<(req:ArsenicRequest, resp:ArsenicResponse, next:(req:ArsenicRequest, resp:ArsenicResponse)=>void)=>void> = [];
 
-    constructor(pattern:string) {
+    constructor(app:Application, pattern:string) {
         const  p = "^" + pattern.replace(/:([a-zA-Z0-9]+)/g, "(?<_$1>[^\\/]+)") + "/?$"
         this._regexp = XRegExp(p)
+        this._app = app
     }
 
     /**
@@ -70,11 +73,14 @@ export class Route {
         return this._contentTypes.length == 0 || this._contentTypes.includes(req.contentType)
     }
 
-    public handle(req:ArsenicRequest, resp:ArsenicResponse) {
-        this._handle(req, resp, this._filters);
+    public handle(appFilters: Array<FilterType> ,req:ArsenicRequest, resp:ArsenicResponse) {
+        let array: Array<(req:ArsenicRequest, resp:ArsenicResponse, next:(req:ArsenicRequest, resp:ArsenicResponse)=>void)=>void>  = []
+        array.push(...appFilters)
+        array.push(...this._filters)
+        this._handle(req, resp, array);
     }
 
-    public _handle(req:ArsenicRequest, resp:ArsenicResponse, filters:Array<(req:ArsenicRequest, resp:ArsenicResponse, next:(req:ArsenicRequest, resp:ArsenicResponse)=>void)=>void>) {
+    public _handle(req:ArsenicRequest, resp:ArsenicResponse, filters:Array<FilterType>) {
         if (filters.length == 0) {
             if (this._target != null) {
                 this._target(req, resp);

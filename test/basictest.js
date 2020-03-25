@@ -20,9 +20,9 @@ const alter = (req, resp, next) => {
     next(req, resp)
 }
 
-const f = (req, resp, next) => req.test = [] && next(req, resp);
-const f1 = (req, resp, next) => req.test.push(1) && next(req, resp) 
-const f2 = (req, resp, next) => req.test.push(2) && next(req, resp)
+const f = (req, resp, next) => { req.test = [] ; next(req, resp);}
+const f1 = (req, resp, next) => { req.test.push(1); next(req, resp) }
+const f2 = (req, resp, next) => { req.test.push(2); next(req, resp) }
 
 let app = arsenic()
 app.route("/about").method("GET").target((req, res) => { res.header("Content-Type","text/plain").body("OK").end() })
@@ -41,6 +41,22 @@ app.route("/custom-headers").method("GET").target((req, res) => {
     res.body("this response has headers")
     res.end()
 })
+
+app.filter((req, resp, next) => {
+    req.appLevelFiltering = "a"
+    next(req, resp)
+})
+
+app.route("/appfilter").method("GET")
+    .filter((req, resp, next) => {
+        req.appLevelFiltering = req.appLevelFiltering + "b"
+        next(req, resp)
+    })
+    .target((req, res) => {
+        res.status(200)
+        res.body(req.appLevelFiltering)
+        res.end()        
+    })
 
 app.listen(PORT)
 
@@ -180,6 +196,19 @@ describe('the /filterorder resource must handle the filters in the proper order'
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.text).to.be.eql("OK1,2");
+                done();
+            });
+        });
+});
+
+describe('the /appfilter resource must handle the filters in the proper order', () => {
+    it('it should return the correct body', (done) => {
+        chai.request(app)
+            .keepOpen()
+            .get('/appfilter')
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.text).to.be.eql("ab");
                 done();
             });
         });

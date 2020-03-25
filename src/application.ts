@@ -4,10 +4,14 @@ import { ArsenicResponse } from "./response";
 import { Route } from "./route";
 import { AddressInfo } from "net";
 
+export type FilterType = (req:ArsenicRequest, resp:ArsenicResponse, next:(req:ArsenicRequest, resp:ArsenicResponse)=>void)=>void
+
 export default class Application {
 
     private routes: Route[]
     private server: http.Server|null
+
+    private filters: Array<FilterType> = [];
 
     constructor() {
         this.routes = []
@@ -22,7 +26,7 @@ export default class Application {
      * @returns a newly created route.
      */
     public route(pattern:string) {
-        const route = new Route(pattern)
+        const route = new Route(this, pattern)
         this.routes.push(route)
 
         return route
@@ -59,7 +63,7 @@ export default class Application {
                     let firstParams = routes[0][1]
                     if (firstParams != null) {
                         arsenicReq.pathparams = firstParams
-                        firstRoute.handle(arsenicReq, arsenicRes)
+                        firstRoute.handle(this.filters, arsenicReq, arsenicRes)
                     } else {
                         throw("should not happend")
                     }
@@ -89,5 +93,15 @@ export default class Application {
         } else {
             return null;
         }        
+    }
+
+     /**
+     * Add a filter to this app.
+     * 
+     * @param filter 
+     * 
+     */
+    public filter(filter:FilterType) {
+        this.filters.push(filter)
     }
 }
