@@ -73,11 +73,8 @@ export class Route {
         return this._contentTypes.length == 0 || this._contentTypes.includes(req.contentType)
     }
 
-    public handle(appFilters: Array<FilterType> ,req:ArsenicRequest, resp:ArsenicResponse) {
-        let array: Array<(req:ArsenicRequest, resp:ArsenicResponse, next:(req:ArsenicRequest, resp:ArsenicResponse)=>void)=>void>  = []
-        array.push(...appFilters)
-        array.push(...this._filters)
-        this._handle(req, resp, array);
+    public handle(req:ArsenicRequest, resp:ArsenicResponse) {
+        this._handle(req, resp, this._filters);
     }
 
     public _handle(req:ArsenicRequest, resp:ArsenicResponse, filters:Array<FilterType>) {

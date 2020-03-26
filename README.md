@@ -110,6 +110,11 @@ app.listen(port)
 
 ## release 0.4.0
 
+- fixed an issue with app level filtering (was only applied on known route, now applied)
+
+
+## release 0.4.0
+
 - app level filtering with the app.filter() method
 
 ## release 0.3.0

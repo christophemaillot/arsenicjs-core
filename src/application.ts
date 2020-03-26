@@ -43,6 +43,22 @@ export default class Application {
         const arsenicReq = new ArsenicRequest(req)
         const arsenicRes = new ArsenicResponse(res)
 
+        const handlers = (req:ArsenicRequest, res:ArsenicResponse, filters:Array<FilterType>) => {
+            if (filters.length == 0) {
+                this.privhandlerfiltered(req, res)
+            } else {
+                const filter = filters.shift()
+                if (filter) {
+                    filter(req, res, (aReq, aRes) => {
+                        handlers(aReq, aRes, filters)
+                    })
+                }
+            }
+        }
+        handlers(arsenicReq, arsenicRes, [...this.filters])
+    }
+
+    private privhandlerfiltered(arsenicReq:ArsenicRequest, arsenicRes:ArsenicResponse) {
         // filter by path pattern
         var routes : Array<[Route, { [key:string]: string } | null]> = this.routes.map(route  => [route, route.matchPath(arsenicReq)]);
         routes = routes.filter(item => item[1] != null);
@@ -63,7 +79,7 @@ export default class Application {
                     let firstParams = routes[0][1]
                     if (firstParams != null) {
                         arsenicReq.pathparams = firstParams
-                        firstRoute.handle(this.filters, arsenicReq, arsenicRes)
+                        firstRoute.handle(arsenicReq, arsenicRes)
                     } else {
                         throw("should not happend")
                     }

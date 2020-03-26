@@ -1,7 +1,5 @@
 let { arsenic } = require('../dist/index')
 
-console.log(arsenic)
-
 //let portfinder = require("portfinder")
 let chai = require('chai');
 let chaiHttp = require('chai-http');
@@ -44,6 +42,11 @@ app.route("/custom-headers").method("GET").target((req, res) => {
 
 app.filter((req, resp, next) => {
     req.appLevelFiltering = "a"
+    next(req, resp)
+})
+
+app.filter((req, resp, next) => {
+    resp.header("X-app-filtered", "on")
     next(req, resp)
 })
 
@@ -209,6 +212,19 @@ describe('the /appfilter resource must handle the filters in the proper order', 
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.text).to.be.eql("ab");
+                done();
+            });
+        });
+});
+
+describe('the /not-found-it should be filtered', () => {
+    it('it should be filtered', (done) => {
+        chai.request(app)
+            .keepOpen()
+            .get('/not-found-it')
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res).to.have.header("X-app-filtered", "on")
                 done();
             });
         });
