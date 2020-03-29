@@ -108,10 +108,13 @@ app.listen(port)
 
 # releases
 
+## release 0.5.0
+
+- add route wildcard pattern
+
 ## release 0.4.1
 
 - fixed an issue with app level filtering (was only applied on known route, now applied)
-
 
 ## release 0.4.0
 
