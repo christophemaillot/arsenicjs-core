@@ -11,12 +11,15 @@ export class Route {
     private _contentTypes: string[] = []
     private _target:((req:ArsenicRequest, resp:ArsenicResponse)=>void)|null = null
     private _regexp:RegExp
+    private _pattern: string
 
     private _filters: Array<(req:ArsenicRequest, resp:ArsenicResponse, next:(req:ArsenicRequest, resp:ArsenicResponse)=>void)=>void> = [];
 
     constructor(app:Application, pattern:string) {
-        const  p = "^" + pattern.replace(/:([a-zA-Z0-9]+)/g, "(?<_$1>[^\\/]+)") + "/?$"
+
+        const  p = "^" + pattern.replace(/:([a-zA-Z0-9]+)/g, "(?<_$1>[^\\/]+)").replace(/\*/, "(?<_$1>.*)") + "/?$"
         this._regexp = XRegExp(p)
+        this._pattern = p
         this._app = app
     }
 
